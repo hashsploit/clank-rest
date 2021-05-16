@@ -1,0 +1,17 @@
+{
+	"log_level": "info",
+	"host": "0.0.0.0",
+	"port": 8080,
+	"rpc": {
+		"address": "127.0.0.1",
+		"port": "8484",
+		"encryption": {
+			"enabled": false,
+			"cert_chain": null,
+			"private_key": null
+		}
+	},
+	"auth_tokens": [
+		"e9312ccbeae949c1d3e5104bb91039e86e489578",
+	]
+}

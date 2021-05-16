@@ -1,0 +1,37 @@
+{
+	"name": "clank-rest",
+	"version": "0.1.1",
+	"description": "A REST API web server for Clank",
+	"main": "index.js",
+	"scripts": {
+		"start": "launch.sh"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/hashsploit/clank-rest.git"
+	},
+	"keywords": [
+		"clank",
+		"clank-rest",
+		"rest",
+		"api",
+		"json",
+		"web",
+		"rpc",
+		"grpc",
+		"mls",
+		"medius"
+	],
+	"author": "hashsploit",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/hashsploit/clank-rest/issues"
+	},
+	"homepage": "https://github.com/hashsploit/clank-rest",
+	"dependencies": {
+		"@grpc/grpc-js": "^1.3.2",
+		"@grpc/proto-loader": "^0.6.2",
+		"chalk": "^4.1.1",
+		"express": "^4.17.1"
+	}
+}

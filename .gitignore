@@ -1,0 +1,12 @@
+# IDE files
+.classpath
+.project
+.settings/
+
+# Config
+!config.json.example
+config.json
+
+# Bins
+/node_modules/
+/node_trace.*.log
