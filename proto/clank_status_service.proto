@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "net.hashsploit.clank.server.rpc";
+option java_outer_classname = "ClankRestService";
+
+package net.hashsploit.clank.server.rpc;
+
+// This is the Clank REST/Bridge Service
+service ClankRestService {
+
+	// List all players available
+	rpc ListPlayers(ListPlayersRequest) returns (ListPlayersResponse) {}
+
+	// List all available worlds
+	rpc ListWorlds(ListWorldsRequest) returns (ListWorldsResponse) {}
+
+	// List all server channels available
+	rpc ListChannels(ListChannelsRequest) returns (ListChannelsResponse) {}
+
+	// List all server locations available
+	rpc ListLocations(ListLocationsRequest) returns (ListLocationsResponse) {}
+
+	//
+	// Authentication Required
+	//
+
+	// Update a player's info
+	//rpc UpdatePlayer(UpdatePlayerRequest) returns (UpdatePlayerResponse) {}
+
+	// Update a world's info
+	//rpc UpdateWorld(UpdateWorldRequest) returns (UpdateWorldResponse) {}
+
+	// Chat message response
+	//rpc SendChatMessage(ChatMessageRequest) returns (ChatMessageResponse) {}
+
+}
+
+message ListWorldsRequest {
+	int32 max_results = 1;
+}
+
+message ListWorldsRequest {
+	repeated World worlds = 1;
+}
+
+message World {
+	int32 id = 1;
+	string name = 2;
+	int32 player_count = 3;
+	int32 max_players = 4;
+	string room_name = 5;
+	bool world_password = 6;
+	bool spectator_password = 7;
+	WorldStatus world_status = 8;
+	repeated PlayerWorldObject players = 9;
+}
+
+message PlayerWorldObject {
+	int32 player_index = 1;
+	bool session_master = 2;
+	Player player = 3;
+}
+
+message Player {
+	int32 account_id = 1;
+	string username = 2;
+	PlayerStatus player_status = 3;
+	string online_since = 4;
+	string last_ping = 5;
+	string clan_tag = 6;
+	string stats = 7;
+}
+
+enum PlayerStatus {
+	DISCONNECTED = 0;
+	CONNECTED = 1;
+	STAGING = 2;
+	ACTIVE = 3;
+}
+
+enum WorldStatus {
+	CREATED = 0;
+	STAGING = 1;
+	ACTIVE = 2;
+	DESTROYED = 3;
+}
+
+
+
+
+
+
+
+
+message PlayersOnlineRequest {
+	int32 max_players = 1;
+}
+
+message PlayersOnlineResponse {
+	repeated Player players = 1;
+}
+
+message PlayerUpdateRequest {
+	string mls_token = 1;
+	int32 world_id = 2;
+	PlayerStatus player_status = 3;
+}

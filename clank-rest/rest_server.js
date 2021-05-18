@@ -25,23 +25,7 @@ function start(host, port) {
 			"source": "https://github.com/hashsploit/clank-rest",
 			"status": failed_services.length == 0 ? "OK" : "ERROR",
 			"errors": failed_services,
-			"endpoints": {
-				"/": {
-					"GET": {
-						"query": null,
-						"description": "Basic information on endpoints and the clank-rest bridge server."
-					},
-					"PUT": null,
-					"POST": null,
-					"DELETE": null
-				},
-				"/players": {
-					"GET": {
-						"query": null,
-						"description": "Returns all players currently online."
-					}
-				}
-			}
+			"time": Math.floor(Date.now() / 1000)
 		};
 		return res.send(info);
 	});

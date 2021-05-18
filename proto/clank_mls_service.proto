@@ -8,19 +8,19 @@ package net.hashsploit.clank.server.rpc;
 
 // This is the Clank Medius Lobby Server Service.
 service ClankMlsService {
-	
+
 	// DME: This RPC endpoint updates player information.
 	rpc PlayerUpdate(PlayerUpdateRequest) returns (PlayerUpdateResponse) {}
-	
+
 	// DME: This RPC endpoint updates world information.
 	rpc WorldUpdate(WorldUpdateRequest) returns (WorldUpdateResponse) {}
-	
+
 	// BOT: This RPC endpoint exposes all players in the lobby.
 	rpc PlayersOnline(PlayersOnlineRequest) returns (PlayersOnlineResponse) {}
 
 	// MAS: Check player login
 	rpc PlayerLogin(PlayerLoginRequest) returns (PlayerLoginResponse) {}
-	
+
 	// MAS Generate sessionkey from MLS
 	rpc GenerateSessionKey(SessionKeyRequest) returns (SessionKeyResponse) {}
 
@@ -83,7 +83,7 @@ message WorldUpdateResponse {
 
 message PlayerLoginRequest {
 	string session_key = 1;
-	string username = 2; 
+	string username = 2;
 	string password = 3;
 }
 
