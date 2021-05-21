@@ -1,0 +1,191 @@
+##
+# R&C Website, REST API services, and websocket gateway services
+##
+
+map $http_upgrade $connection_upgrade {
+	default upgrade;
+	'' close;
+}
+
+##
+# Upstream servers
+##
+upstream clank_uya_web {
+	server 10.0.0.18:8200;
+}
+upstream clank_dl_web {
+	server 10.0.0.18:8201;
+}
+upstream clank_uya_api {
+	server 10.0.0.18:8280;
+}
+upstream clank_dl_api {
+	server 10.0.0.18:8281;
+}
+upstream clank_uya_dmewsc {
+	server 10.0.0.18:8686;
+}
+upstream clank_dl_dmewsc {
+	server 10.0.0.18:8687;
+}
+
+##
+# HTTP Listener
+##
+server {
+	listen 80;
+	server_name uya.raconline.gg dl.raconline.gg raconline.gg;
+	access_log off;
+	error_log off;
+	return 301 https://$server_name$request_uri;
+}
+
+server {
+	listen 80;
+	server_name uyaonline.com;
+	access_log off;
+	error_log off;
+	return 301 https://raconline.com$request_uri;
+}
+
+server {
+	listen 443 ssl;
+	server_name uyaonline.com;
+	ssl_session_timeout 5m;
+	ssl_certificate /etc/nginx/certs/raconline.gg.cert;
+	ssl_certificate_key /etc/nginx/certs/raconline.gg.key;
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+	access_log off;
+	error_log  off;
+	return 301 https://raconline.com$request_uri;
+}
+
+##
+# HTTPS Listener for raconline.com
+##
+server {
+	listen              443 ssl;
+	server_name         raconline.gg;
+	ssl_session_timeout 5m;
+	ssl_certificate     /etc/nginx/certs/raconline.gg.cert;
+	ssl_certificate_key /etc/nginx/certs/raconline.gg.key;
+	ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+	access_log          off;
+	error_log           off;
+	root                /var/www/raconline.gg/public;
+	index               index.html index.php;
+
+	# PHP website
+	location / {
+		try_files $uri $uri/ /index.php?/$request_uri;
+		location = /index.php {
+			fastcgi_index index.php;
+			fastcgi_send_timeout 30;
+			fastcgi_read_timeout 30;
+			fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+			fastcgi_param CI_ENV "production";
+			fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+			include fastcgi_params;
+		}
+	}
+}
+
+##
+# HTTPS Listener for uya.raconline.com
+##
+server {
+	listen              443 ssl;
+	server_name         uya.raconline.gg;
+	ssl_session_timeout 5m;
+	ssl_certificate     /etc/nginx/certs/raconline.gg.cert;
+	ssl_certificate_key /etc/nginx/certs/raconline.gg.key;
+	ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+	access_log          off;
+	error_log           off;
+	index               index.html index.php;
+
+	# API handler
+	location /api {
+		add_header             Gateway "Clank UYA API #$connection";
+		proxy_intercept_errors on;
+		proxy_http_version     1.1;
+		proxy_connect_timeout  8s;
+		proxy_read_timeout     5s;
+		proxy_send_timeout     5s;
+		proxy_pass             http://clank_uya_api;
+	}
+
+	# WebSocket endpoint
+	location /api/dmewsc {
+		add_header             Gateway "Clank UYA DME WSC #$connection";
+		proxy_intercept_errors on;
+		proxy_http_version     1.1;
+		proxy_set_header       Upgrade $http_upgrade;
+		proxy_set_header       Connection $connection_upgrade;
+		proxy_connect_timeout  8s;
+		proxy_read_timeout     5s;
+		proxy_send_timeout     5s;
+		proxy_pass             http://clank_uya_dmewsc;
+	}
+
+	# Forward to website
+	location / {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Forwarded-Host  $host;
+		proxy_set_header X-Forwarded-Port  $server_port;
+		proxy_pass       http://clank_uya_web;
+	}
+}
+
+##
+# HTTPS Listener for dl.raconline.com
+##
+server {
+	listen              443 ssl;
+	server_name         dl.raconline.gg;
+	ssl_session_timeout 5m;
+	ssl_certificate     /etc/nginx/certs/raconline.gg.cert;
+	ssl_certificate_key /etc/nginx/certs/raconline.gg.key;
+	ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+	access_log          off;
+	error_log           off;
+	index               index.html index.php;
+
+	# API handler
+	location /api {
+		add_header             Gateway "Clank DL API #$connection";
+		proxy_intercept_errors on;
+		proxy_http_version     1.1;
+		proxy_connect_timeout  8s;
+		proxy_read_timeout     5s;
+		proxy_send_timeout     5s;
+		proxy_pass             http://clank_dl_api;
+	}
+
+	# WebSocket endpoint
+	location /api/dmewsc {
+		add_header             Gateway "Clank DL DME WSC #$connection";
+		proxy_intercept_errors on;
+		proxy_http_version     1.1;
+		proxy_set_header       Upgrade $http_upgrade;
+		proxy_set_header       Connection $connection_upgrade;
+		proxy_connect_timeout  8s;
+		proxy_read_timeout     5s;
+		proxy_send_timeout     5s;
+		proxy_pass             http://clank_dl_dmewsc;
+	}
+
+	# Forward to website
+	location / {
+		proxy_set_header Host              $host;
+		proxy_set_header X-Real-IP         $remote_addr;
+		proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Forwarded-Host  $host;
+		proxy_set_header X-Forwarded-Port  $server_port;
+		proxy_pass       http://clank_dl_web;
+	}
+}
