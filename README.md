@@ -1,4 +1,4 @@
-# Clank REST API
+![Clank Rest Logo](clank-rest-logo.png)
 
 This repository creates a REST API web server for [Clank](https://github.com/hashsploit/clank).
 
